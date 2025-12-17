@@ -58,7 +58,7 @@ class RegisterView(generics.CreateAPIView):
             ),
             400: "Bad Request - Validation errors"
         },
-        tags=['Auth']
+        tags=['auth']
     )
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -122,7 +122,7 @@ class LoginView(APIView):
             ),
             400: "Bad Request - Invalid credentials"
         },
-        tags=['Auth']
+        tags=['auth']
     )
     def post(self, request):
         serializer = LoginSerializer(data=request.data, context={'request': request})
@@ -182,7 +182,7 @@ class LogoutView(APIView):
             400: "Bad Request - Invalid token",
             401: "Unauthorized - Authentication required"
         },
-        tags=['Auth'],
+        tags=['auth'],
         security=[{'Bearer': []}]
     )
     def post(self, request):
@@ -226,7 +226,7 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
             403: "Forbidden - Not authorized to access this profile",
             404: "Not Found - User does not exist"
         },
-        tags=['Users'],
+        tags=['users'],
         security=[{'Bearer': []}]
     )
     def get_object(self):
@@ -254,7 +254,7 @@ class CurrentUserView(APIView):
             200: UserSerializer,
             401: "Unauthorized - Authentication required"
         },
-        tags=['Users'],
+        tags=['users'],
         security=[{'Bearer': []}]
     )
     def get(self, request):
@@ -289,7 +289,7 @@ class ChangePasswordView(APIView):
             400: "Bad Request - Invalid old password or validation error",
             401: "Unauthorized - Authentication required"
         },
-        tags=['Users'],
+        tags=['users'],
         security=[{'Bearer': []}]
     )
     def post(self, request):
@@ -333,7 +333,7 @@ class UserListView(generics.ListAPIView):
             200: UserSerializer(many=True),
             401: "Unauthorized - Authentication required"
         },
-        tags=['Users'],
+        tags=['users'],
         security=[{'Bearer': []}]
     )
     def get_queryset(self):
@@ -392,7 +392,7 @@ class CreateAdminView(generics.CreateAPIView):
             401: "Unauthorized - Authentication required",
             403: "Forbidden - Admin privileges required"
         },
-        tags=['Admin'],
+        tags=['admin'],
         security=[{'Bearer': []}]
     )
     def create(self, request, *args, **kwargs):
@@ -480,7 +480,7 @@ class PromoteToAdminView(APIView):
             403: "Forbidden - Admin privileges required",
             404: "Not Found - User does not exist"
         },
-        tags=['Admin'],
+        tags=['admin'],
         security=[{'Bearer': []}]
     )
     def post(self, request):
