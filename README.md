@@ -300,8 +300,27 @@ python manage.py migrate
 
 ### Running Tests
 ```bash
+# Run all tests
 python manage.py test
+
+# Run specific app tests
+python manage.py test core
+python manage.py test library
+python manage.py test loan
+
+# Run with coverage
+coverage run --source='.' manage.py test
+coverage report
+
+# See detailed testing guide
+# Check TESTING_GUIDE.md
 ```
+
+### Test Coverage
+- **80+ unit tests** covering models, serializers, and views
+- **Integration tests** for complete workflows
+- **Security tests** for unauthorized access
+- **Performance tests** for pagination and filtering
 
 ### Accessing Admin Panel
 1. Create a superuser (if not already done)
@@ -351,14 +370,17 @@ Required environment variables in `.env`:
 - [x] Book availability management
 - [x] API documentation with Swagger/OpenAPI
 - [x] Security implementation (CSRF, XSS, SQL Injection protection)
+- [x] Comprehensive unit tests (80+ tests)
+- [x] Integration tests for workflows
+- [x] API tests for all endpoints
+- [x] Security and permission tests
 - [ ] Email notifications for overdue books
 - [ ] Book reservations
 - [ ] Fine calculation for overdue returns
-- [ ] Unit and integration tests
 - [ ] Book cover image upload
 - [ ] Export reports (PDF/Excel)
 - [ ] Docker deployment
-- [ ] CI/CD pipeline
+- [ ] CI/CD pipeline with automated testing
 
 ## License
 

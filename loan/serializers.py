@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.core.validators import MinValueValidator, MaxValueValidator
 from .models import Loan
 from library.serializers import BookListSerializer
 from core.serializers import UserSerializer
@@ -155,7 +156,10 @@ class LoanRenewSerializer(serializers.Serializer):
     """
     Serializer for renewing a loan
     """
-    days = serializers.IntegerField(default=14, min_value=1, max_value=30)
+    days = serializers.IntegerField(
+        default=14,
+        validators=[MinValueValidator(1), MaxValueValidator(30)]
+    )
     
     def validate(self, attrs):
         """Validate that loan can be renewed"""
