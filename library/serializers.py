@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from django.core.validators import MinValueValidator, MaxValueValidator
+from decimal import Decimal
 from .models import Book
 from core.serializers import UserSerializer
 
@@ -10,6 +12,13 @@ class BookSerializer(serializers.ModelSerializer):
     added_by = UserSerializer(read_only=True)
     is_available = serializers.BooleanField(read_only=True)
     borrowed_copies = serializers.IntegerField(read_only=True)
+    rating = serializers.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        required=False,
+        allow_null=True,
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('5.00'))]
+    )
     
     class Meta:
         model = Book
@@ -46,6 +55,13 @@ class BookListSerializer(serializers.ModelSerializer):
     Simplified serializer for book listings (lighter payload)
     """
     is_available = serializers.BooleanField(read_only=True)
+    rating = serializers.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        required=False,
+        allow_null=True,
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('5.00'))]
+    )
     
     class Meta:
         model = Book
@@ -60,6 +76,14 @@ class BookCreateSerializer(serializers.ModelSerializer):
     """
     Serializer for creating new books (admin only)
     """
+    rating = serializers.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        required=False,
+        allow_null=True,
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('5.00'))]
+    )
+    
     class Meta:
         model = Book
         fields = (

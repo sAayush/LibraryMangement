@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
+from decimal import Decimal
 
 
 class Book(models.Model):
@@ -91,7 +92,7 @@ class Book(models.Model):
         decimal_places=2,
         null=True,
         blank=True,
-        validators=[MinValueValidator(0.0), MaxValueValidator(5.0)],
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('5.00'))],
         help_text='Average rating (0-5)'
     )
     
