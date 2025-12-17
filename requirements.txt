@@ -17,3 +17,4 @@ uritemplate==4.2.0
 gunicorn==23.0.0
 whitenoise==6.8.2
 dj-database-url==2.3.0
+Faker==33.1.0
