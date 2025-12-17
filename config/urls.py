@@ -26,17 +26,58 @@ schema_view = get_schema_view(
         title="Library Management System API",
         default_version='v1',
         description="""
-        Comprehensive Library Management System API with JWT Authentication
+        # Library Management System API
         
-        ## User Roles
-        - **Anonymous**: Can browse books (read-only)
-        - **USER**: Can browse and borrow books
-        - **ADMIN**: Full access to manage books and users
+        Comprehensive REST API for library management with JWT authentication and role-based access control.
+        
+        ## 🔐 Authentication
+        
+        This API uses **JWT (JSON Web Token)** authentication. To use protected endpoints:
+        
+        1. **Register** or **Login** to get your access token
+        2. Click the **"Authorize"** button (🔓) at the top right
+        3. Enter: `Bearer <your_access_token>`
+        4. Click **"Authorize"** and close the dialog
+        5. All authenticated requests will now include your token
+        
+        **Token Lifecycle:**
+        - Access tokens expire after **1 hour**
+        - Refresh tokens expire after **7 days**
+        - Use `/api/auth/token/refresh/` to get a new access token
+        
+        ## 👥 User Roles
+        
+        | Role | Permissions |
+        |------|-------------|
+        | **Anonymous** | Browse books (read-only) |
+        | **USER** | Browse and borrow books |
+        | **ADMIN** | Full access: manage users and books |
+        
+        ## 📚 API Organization
+        
+        - **Auth**: Registration, login, logout, token management
+        - **Users**: Profile management, password changes, user listing
+        - **Admin**: Create admins, promote users (Admin only)
+        
+        ## 🚀 Quick Start
+        
+        1. Register: `POST /api/auth/register/`
+        2. Login: `POST /api/auth/login/` (returns tokens)
+        3. Use your access token for authenticated requests
+        
+        ---
+        
+        **Current Features:** User authentication & management  
+        **Coming Soon:** Book catalog, loan tracking, advanced search
         """,
+        terms_of_service="https://www.example.com/terms/",
+        contact=openapi.Contact(email="support@library.example.com"),
+        license=openapi.License(name="MIT License"),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
     authentication_classes=[],
+    patterns=[path('api/', include('core.urls'))],  # Only include API endpoints, exclude Django admin
 )
 
 urlpatterns = [

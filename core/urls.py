@@ -9,6 +9,8 @@ from .views import (
     CurrentUserView,
     ChangePasswordView,
     UserListView,
+    CreateAdminView,
+    PromoteToAdminView,
 )
 
 app_name = 'core'
@@ -21,10 +23,14 @@ urlpatterns = [
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
     # User management endpoints
-    path('auth/me/', CurrentUserView.as_view(), name='current-user'),
-    path('auth/profile/', UserProfileView.as_view(), name='user-profile'),
-    path('auth/profile/<int:pk>/', UserProfileView.as_view(), name='user-profile-detail'),
-    path('auth/change-password/', ChangePasswordView.as_view(), name='change-password'),
+    path('users/me/', CurrentUserView.as_view(), name='current-user'),
+    path('users/profile/', UserProfileView.as_view(), name='user-profile'),
+    path('users/profile/<int:pk>/', UserProfileView.as_view(), name='user-profile-detail'),
+    path('users/change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('users/', UserListView.as_view(), name='user-list'),
+    
+    # Admin endpoints
+    path('admin/create-admin/', CreateAdminView.as_view(), name='create-admin'),
+    path('admin/promote/', PromoteToAdminView.as_view(), name='promote-to-admin'),
 ]
 

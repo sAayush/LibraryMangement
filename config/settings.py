@@ -90,12 +90,24 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# Validate required database environment variables
+def get_required_env(key):
+    """Get required environment variable or raise clear error"""
+    value = os.getenv(key)
+    if value is None:
+        raise ValueError(
+            f"Required environment variable '{key}' is not set. "
+            f"Please add it to your .env file. "
+            f"See .env.example for reference."
+        )
+    return value
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'NAME': get_required_env('DB_NAME'),
+        'USER': get_required_env('DB_USER'),
+        'PASSWORD': get_required_env('DB_PASSWORD'),
         'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', '5432'),
     }
@@ -195,4 +207,5 @@ SWAGGER_SETTINGS = {
     'SHOW_EXTENSIONS': True,
     'DEFAULT_MODEL_RENDERING': 'model',
     'DEFAULT_MODEL_DEPTH': 3,
+    'VALIDATOR_URL': None,
 }

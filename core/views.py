@@ -58,7 +58,7 @@ class RegisterView(generics.CreateAPIView):
             ),
             400: "Bad Request - Validation errors"
         },
-        tags=['Authentication']
+        tags=['Auth']
     )
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -122,7 +122,7 @@ class LoginView(APIView):
             ),
             400: "Bad Request - Invalid credentials"
         },
-        tags=['Authentication']
+        tags=['Auth']
     )
     def post(self, request):
         serializer = LoginSerializer(data=request.data, context={'request': request})
@@ -182,7 +182,7 @@ class LogoutView(APIView):
             400: "Bad Request - Invalid token",
             401: "Unauthorized - Authentication required"
         },
-        tags=['Authentication'],
+        tags=['Auth'],
         security=[{'Bearer': []}]
     )
     def post(self, request):
@@ -226,7 +226,7 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
             403: "Forbidden - Not authorized to access this profile",
             404: "Not Found - User does not exist"
         },
-        tags=['User Management'],
+        tags=['Users'],
         security=[{'Bearer': []}]
     )
     def get_object(self):
@@ -254,7 +254,7 @@ class CurrentUserView(APIView):
             200: UserSerializer,
             401: "Unauthorized - Authentication required"
         },
-        tags=['User Management'],
+        tags=['Users'],
         security=[{'Bearer': []}]
     )
     def get(self, request):
@@ -289,7 +289,7 @@ class ChangePasswordView(APIView):
             400: "Bad Request - Invalid old password or validation error",
             401: "Unauthorized - Authentication required"
         },
-        tags=['User Management'],
+        tags=['Users'],
         security=[{'Bearer': []}]
     )
     def post(self, request):
@@ -333,7 +333,7 @@ class UserListView(generics.ListAPIView):
             200: UserSerializer(many=True),
             401: "Unauthorized - Authentication required"
         },
-        tags=['User Management'],
+        tags=['Users'],
         security=[{'Bearer': []}]
     )
     def get_queryset(self):
@@ -342,3 +342,181 @@ class UserListView(generics.ListAPIView):
             return User.objects.all()
         # Regular users can only see themselves
         return User.objects.filter(id=self.request.user.id)
+
+
+class CreateAdminView(generics.CreateAPIView):
+    """
+    API endpoint to create admin users.
+    Only accessible by existing administrators.
+    """
+    queryset = User.objects.all()
+    serializer_class = RegisterSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    @swagger_auto_schema(
+        operation_summary="Create admin user",
+        operation_description="""
+        Create a new administrator account.
+        Only existing administrators can create new admins.
+        
+        This endpoint creates a user with ADMIN role who has full access to:
+        - Manage all users
+        - Add/remove books (coming soon)
+        - View all loans (coming soon)
+        
+        **Requires Admin privileges.**
+        """,
+        responses={
+            201: openapi.Response(
+                description="Admin user created successfully",
+                examples={
+                    "application/json": {
+                        "user": {
+                            "id": 2,
+                            "username": "admin2",
+                            "email": "admin2@example.com",
+                            "first_name": "Admin",
+                            "last_name": "User",
+                            "role": "ADMIN",
+                            "created_at": "2024-01-01T12:00:00Z"
+                        },
+                        "message": "Admin user created successfully",
+                        "tokens": {
+                            "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+                            "access": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+                        }
+                    }
+                }
+            ),
+            400: "Bad Request - Validation errors",
+            401: "Unauthorized - Authentication required",
+            403: "Forbidden - Admin privileges required"
+        },
+        tags=['Admin'],
+        security=[{'Bearer': []}]
+    )
+    def create(self, request, *args, **kwargs):
+        # Check if user is admin
+        if not request.user.is_admin:
+            return Response({
+                'error': 'Only administrators can create admin accounts'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        # Create user with ADMIN role
+        user = User.objects.create_user(
+            username=serializer.validated_data['username'],
+            email=serializer.validated_data['email'],
+            password=serializer.validated_data['password'],
+            first_name=serializer.validated_data.get('first_name', ''),
+            last_name=serializer.validated_data.get('last_name', ''),
+            role=User.UserRole.ADMIN  # Set as ADMIN
+        )
+        
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+        
+        user_data = UserSerializer(user).data
+        
+        return Response({
+            'user': user_data,
+            'message': 'Admin user created successfully',
+            'tokens': {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            }
+        }, status=status.HTTP_201_CREATED)
+
+
+class PromoteToAdminView(APIView):
+    """
+    API endpoint to promote an existing user to admin.
+    Only accessible by administrators.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    
+    @swagger_auto_schema(
+        operation_summary="Promote user to admin",
+        operation_description="""
+        Promote an existing regular user to administrator role.
+        Only existing administrators can promote users.
+        
+        Provide the user ID in the request body to promote them to ADMIN role.
+        
+        **Requires Admin privileges.**
+        """,
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'user_id': openapi.Schema(
+                    type=openapi.TYPE_INTEGER,
+                    description='ID of the user to promote to admin'
+                )
+            },
+            required=['user_id']
+        ),
+        responses={
+            200: openapi.Response(
+                description="User promoted successfully",
+                examples={
+                    "application/json": {
+                        "message": "User promoted to admin successfully",
+                        "user": {
+                            "id": 3,
+                            "username": "johndoe",
+                            "email": "john@example.com",
+                            "first_name": "John",
+                            "last_name": "Doe",
+                            "role": "ADMIN",
+                            "created_at": "2024-01-01T12:00:00Z"
+                        }
+                    }
+                }
+            ),
+            400: "Bad Request - Invalid user ID",
+            401: "Unauthorized - Authentication required",
+            403: "Forbidden - Admin privileges required",
+            404: "Not Found - User does not exist"
+        },
+        tags=['Admin'],
+        security=[{'Bearer': []}]
+    )
+    def post(self, request):
+        # Check if user is admin
+        if not request.user.is_admin:
+            return Response({
+                'error': 'Only administrators can promote users to admin'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        user_id = request.data.get('user_id')
+        
+        if not user_id:
+            return Response({
+                'error': 'user_id is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({
+                'error': 'User not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Check if already admin
+        if user.is_admin:
+            return Response({
+                'error': 'User is already an administrator'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Promote to admin
+        user.role = User.UserRole.ADMIN
+        user.save()
+        
+        user_data = UserSerializer(user).data
+        
+        return Response({
+            'message': 'User promoted to admin successfully',
+            'user': user_data
+        }, status=status.HTTP_200_OK)

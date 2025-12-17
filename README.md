@@ -106,21 +106,31 @@ python manage.py runserver
 
 The API will be available at `http://localhost:8000/api/`
 
+The **Swagger documentation** will be available at `http://localhost:8000/swagger/`
+
 ## API Endpoints
 
-### Authentication
+### 🔐 Authentication
 - `POST /api/auth/register/` - Register a new user
 - `POST /api/auth/login/` - Login and get JWT tokens
 - `POST /api/auth/logout/` - Logout and blacklist token
 - `POST /api/auth/token/refresh/` - Refresh access token
 
-### User Management
-- `GET /api/auth/me/` - Get current user info
-- `GET /api/auth/profile/` - Get/Update own profile
-- `POST /api/auth/change-password/` - Change password
+### 👤 User Management
+- `GET /api/users/me/` - Get current user info
+- `GET /api/users/profile/` - Get/Update own profile
+- `GET /api/users/profile/{id}/` - Get/Update specific user (Admin)
+- `POST /api/users/change-password/` - Change password
 - `GET /api/users/` - List users (role-based access)
 
-For detailed API documentation, see [API_AUTHENTICATION.md](API_AUTHENTICATION.md)
+### 🔑 Admin Operations
+- `POST /api/admin/create-admin/` - Create a new admin user (Admin only)
+- `POST /api/admin/promote/` - Promote user to admin (Admin only)
+
+### 📖 Interactive Documentation
+- **Swagger UI**: `http://localhost:8000/swagger/` - Interactive API documentation
+- **ReDoc**: `http://localhost:8000/redoc/` - Alternative documentation view
+- **OpenAPI Schema**: `http://localhost:8000/swagger.json` - Raw OpenAPI spec
 
 ## Quick Start - Testing Authentication
 
