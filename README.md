@@ -12,17 +12,37 @@ A comprehensive library management system built with Django and Django REST Fram
   - Token refresh and blacklisting
   - User profile management
   
+- **Book Catalog Management**
+  - Complete CRUD operations for books
+  - ISBN validation and uniqueness
+  - Book availability tracking
+  - Cover images and ratings
+  - Status management (Available, Borrowed, Maintenance, Lost)
+  
+- **Advanced Search & Filtering**
+  - Full-text search across title, author, ISBN, description
+  - Filter by status, genre, language, author, publication date, rating
+  - Sort by title, author, date, rating
+  - Pagination (10 items per page)
+  
+- **Loan Management System**
+  - Borrow books (14-day loan period)
+  - Return books with automatic availability updates
+  - Renew loans (up to 2 renewals)
+  - Overdue tracking and management
+  - Loan limit (max 5 active loans per user)
+  
+- **Security Features**
+  - CSRF protection (built-in Django middleware)
+  - XSS protection (Django template escaping)
+  - SQL injection protection (Django ORM)
+  - JWT token authentication
+  - Permission-based access control
+  
 - **User Roles**
-  - **Anonymous Users**: Can browse books (read-only access)
-  - **Registered Users**: Can browse and borrow books
-  - **Administrators**: Full access to manage books and users
-
-### 🚧 Coming Soon
-- Book catalog management (CRUD operations)
-- Book search and filtering
-- Loan management system (borrowing/returning books)
-- Advanced admin panel for library operations
-- Book availability tracking
+  - **Anonymous Users**: Browse and search books (read-only)
+  - **Registered Users**: Browse, search, and borrow books
+  - **Administrators**: Full access to manage books, users, and loans
 
 ## Tech Stack
 
@@ -127,15 +147,33 @@ The **Swagger documentation** will be available at `http://localhost:8000/swagge
 - `POST /api/admin/create-admin/` - Create a new admin user (Admin only)
 - `POST /api/admin/promote/` - Promote user to admin (Admin only)
 
-### 📖 Interactive Documentation
+### 📚 Book Management
+- `GET /api/books/` - List all books (with filtering & search)
+- `GET /api/books/{id}/` - Get book details
+- `POST /api/books/create/` - Add new book (Admin only)
+- `PUT /api/books/{id}/update/` - Update book (Admin only)
+- `DELETE /api/books/{id}/delete/` - Delete book (Admin only)
+- `GET /api/books/{id}/availability/` - Check book availability
+
+### 📖 Loan Management
+- `GET /api/loans/` - List loans (filtered by user role)
+- `GET /api/loans/my/` - Get current user's loans
+- `GET /api/loans/overdue/` - List overdue loans (Admin only)
+- `GET /api/loans/{id}/` - Get loan details
+- `POST /api/loans/borrow/` - Borrow a book
+- `POST /api/loans/{id}/return/` - Return a borrowed book
+- `POST /api/loans/{id}/renew/` - Renew a loan
+
+### 📋 Interactive Documentation
 - **Swagger UI**: `http://localhost:8000/swagger/` - Interactive API documentation
 - **ReDoc**: `http://localhost:8000/redoc/` - Alternative documentation view
 - **OpenAPI Schema**: `http://localhost:8000/swagger.json` - Raw OpenAPI spec
 
-## Quick Start - Testing Authentication
+## Quick Start - Testing the Library System
 
-### 1. Register a New User
+### 1. Register & Login
 ```bash
+# Register a new user
 curl -X POST http://localhost:8000/api/auth/register/ \
   -H "Content-Type: application/json" \
   -d '{
@@ -144,10 +182,8 @@ curl -X POST http://localhost:8000/api/auth/register/ \
     "password": "SecurePass123!",
     "password2": "SecurePass123!"
   }'
-```
 
-### 2. Login
-```bash
+# Login and get access token
 curl -X POST http://localhost:8000/api/auth/login/ \
   -H "Content-Type: application/json" \
   -d '{
@@ -156,11 +192,56 @@ curl -X POST http://localhost:8000/api/auth/login/ \
   }'
 ```
 
-### 3. Use Access Token
+### 2. Browse Books (No Authentication Required)
 ```bash
-curl -X GET http://localhost:8000/api/auth/me/ \
+# List all books
+curl http://localhost:8000/api/books/
+
+# Search for books
+curl "http://localhost:8000/api/books/?search=python"
+
+# Filter available books
+curl "http://localhost:8000/api/books/?status=AVAILABLE"
+
+# Filter by genre
+curl "http://localhost:8000/api/books/?genre__icontains=fiction"
+
+# Get book details
+curl http://localhost:8000/api/books/1/
+```
+
+### 3. Borrow a Book (Requires Authentication)
+```bash
+# Borrow book with ID 1
+curl -X POST http://localhost:8000/api/loans/borrow/ \
+  -H "Authorization: Bearer <your_access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"book_id": 1, "notes": "First book borrowed"}'
+
+# View my loans
+curl -X GET http://localhost:8000/api/loans/my/ \
   -H "Authorization: Bearer <your_access_token>"
 ```
+
+### 4. Manage Books (Admin Only)
+```bash
+# Add a new book (Admin only)
+curl -X POST http://localhost:8000/api/books/create/ \
+  -H "Authorization: Bearer <admin_access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Clean Code",
+    "author": "Robert C. Martin",
+    "isbn": "9780132350884",
+    "page_count": 464,
+    "genre": "Programming",
+    "total_copies": 5,
+    "available_copies": 5
+  }'
+```
+
+### 5. Use Swagger UI (Recommended)
+Visit `http://localhost:8000/swagger/` for interactive API documentation and testing!
 
 ## Project Structure
 
@@ -264,13 +345,18 @@ Required environment variables in `.env`:
 - [x] User authentication system
 - [x] JWT token management
 - [x] Role-based access control
-- [ ] Book model and management
-- [ ] Loan tracking system
-- [ ] Advanced search and filtering
-- [ ] Book availability management
-- [ ] Email notifications
-- [ ] API documentation with Swagger/OpenAPI
-- [ ] Unit tests
+- [x] Book model and management
+- [x] Loan tracking system
+- [x] Advanced search and filtering
+- [x] Book availability management
+- [x] API documentation with Swagger/OpenAPI
+- [x] Security implementation (CSRF, XSS, SQL Injection protection)
+- [ ] Email notifications for overdue books
+- [ ] Book reservations
+- [ ] Fine calculation for overdue returns
+- [ ] Unit and integration tests
+- [ ] Book cover image upload
+- [ ] Export reports (PDF/Excel)
 - [ ] Docker deployment
 - [ ] CI/CD pipeline
 
