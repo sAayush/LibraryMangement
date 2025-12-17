@@ -50,6 +50,8 @@ EXTERNAL_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
     'core',
+    'library',
+    'loan',
 ]
 
 INSTALLED_APPS += EXTERNAL_APPS
