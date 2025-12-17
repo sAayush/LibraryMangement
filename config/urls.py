@@ -58,6 +58,8 @@ schema_view = get_schema_view(
         - **Auth**: Registration, login, logout, token management
         - **Users**: Profile management, password changes, user listing
         - **Admin**: Create admins, promote users (Admin only)
+        - **Books**: Browse, search, and manage library catalog
+        - **Loans**: Borrow, return, and track book loans
         
         ## 🚀 Quick Start
         
@@ -67,8 +69,12 @@ schema_view = get_schema_view(
         
         ---
         
-        **Current Features:** User authentication & management  
-        **Coming Soon:** Book catalog, loan tracking, advanced search
+        **Current Features:**
+        - ✅ User authentication & role-based access
+        - ✅ Book catalog management
+        - ✅ Loan tracking & management
+        - ✅ Advanced filtering & search
+        - ✅ Secure API with CSRF, XSS, SQL injection protection
         """,
         terms_of_service="https://www.example.com/terms/",
         contact=openapi.Contact(email="support@library.example.com"),
@@ -77,7 +83,11 @@ schema_view = get_schema_view(
     public=True,
     permission_classes=(permissions.AllowAny,),
     authentication_classes=[],
-    patterns=[path('api/', include('core.urls'))],  # Only include API endpoints, exclude Django admin
+    patterns=[
+        path('api/', include('core.urls')),
+        path('api/', include('library.urls')),
+        path('api/', include('loan.urls')),
+    ],  # Only include API endpoints, exclude Django admin
 )
 
 urlpatterns = [
@@ -86,6 +96,8 @@ urlpatterns = [
     
     # API endpoints
     path('api/', include('core.urls')),
+    path('api/', include('library.urls')),
+    path('api/', include('loan.urls')),
     
     # Swagger/OpenAPI Documentation
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', 
