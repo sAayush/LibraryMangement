@@ -218,7 +218,11 @@ async function loadStats() {
     }
 }
 
+// Track current search term for pagination
+let currentBookSearch = '';
+
 async function loadBooks(page = 1, search = '') {
+    currentBookSearch = search; // Store current search
     const container = document.getElementById('booksContainer');
     container.innerHTML = '<p class="loading">Loading books...</p>';
     
@@ -239,8 +243,8 @@ async function loadBooks(page = 1, search = '') {
             container.innerHTML = '<p class="loading">No books found</p>';
         }
         
-        // Update pagination
-        updatePagination('booksPagination', data, page, (p) => loadBooks(p, search));
+        // Update pagination - pass function that maintains search
+        updatePagination('booksPagination', data, page, (p) => loadBooks(p, currentBookSearch));
     } catch (error) {
         container.innerHTML = '<p class="loading">Error loading books</p>';
         console.error('Error loading books:', error);
@@ -331,7 +335,8 @@ async function loadLoans(page = 1) {
             container.innerHTML = '<p class="loading">No active loans</p>';
         }
         
-        updatePagination('loansPagination', data, page, loadLoans);
+        // Update pagination - pass function reference directly
+        updatePagination('loansPagination', data, page, (p) => loadLoans(p));
     } catch (error) {
         container.innerHTML = '<p class="loading">Error loading loans</p>';
         console.error('Error loading loans:', error);
@@ -414,22 +419,34 @@ function updatePagination(containerId, data, currentPage, loadFunction) {
     }
     
     const totalPages = Math.ceil(data.count / 10);
-    let html = '';
+    container.innerHTML = ''; // Clear existing buttons
     
+    // Previous button
     if (data.previous) {
-        html += `<button onclick="(${loadFunction})(${currentPage - 1})">Previous</button>`;
+        const prevBtn = document.createElement('button');
+        prevBtn.textContent = 'Previous';
+        prevBtn.addEventListener('click', () => loadFunction(currentPage - 1));
+        container.appendChild(prevBtn);
     }
     
+    // Page number buttons
     for (let i = 1; i <= totalPages; i++) {
-        const active = i === currentPage ? 'active' : '';
-        html += `<button class="${active}" onclick="(${loadFunction})(${i})">${i}</button>`;
+        const pageBtn = document.createElement('button');
+        pageBtn.textContent = i;
+        if (i === currentPage) {
+            pageBtn.classList.add('active');
+        }
+        pageBtn.addEventListener('click', () => loadFunction(i));
+        container.appendChild(pageBtn);
     }
     
+    // Next button
     if (data.next) {
-        html += `<button onclick="(${loadFunction})(${currentPage + 1})">Next</button>`;
+        const nextBtn = document.createElement('button');
+        nextBtn.textContent = 'Next';
+        nextBtn.addEventListener('click', () => loadFunction(currentPage + 1));
+        container.appendChild(nextBtn);
     }
-    
-    container.innerHTML = html;
 }
 
 // Search
