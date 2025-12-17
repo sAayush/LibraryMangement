@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System - Dashboard</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>📚 Library Management System</h1>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="#" class="nav-link active" data-section="overview">Overview</a>
+                <a href="#" class="nav-link" data-section="books">Books</a>
+                <a href="#" class="nav-link" data-section="loans">Loans</a>
+                <a href="/swagger/" class="nav-link">API Docs</a>
+                <a href="#" class="nav-link" id="authBtn">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <!-- Overview Section -->
+        <section id="overview-section" class="section active">
+            <h2>System Overview</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-info">
+                        <h3 id="totalBooks">0</h3>
+                        <p>Total Books</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-info">
+                        <h3 id="availableBooks">0</h3>
+                        <p>Available Books</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📖</div>
+                    <div class="stat-info">
+                        <h3 id="activeLoans">0</h3>
+                        <p>Active Loans</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <h3 id="totalUsers">0</h3>
+                        <p>Registered Users</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>🚀 Quick Start</h3>
+                <div class="info-card">
+                    <h4>API Endpoints</h4>
+                    <ul>
+                        <li><strong>Authentication:</strong> <code>/api/auth/register/</code>, <code>/api/auth/login/</code></li>
+                        <li><strong>Books:</strong> <code>/api/books/</code></li>
+                        <li><strong>Loans:</strong> <code>/api/loans/</code></li>
+                        <li><strong>Documentation:</strong> <a href="/swagger/" target="_blank">Swagger UI</a> | <a href="/redoc/" target="_blank">ReDoc</a></li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h4>Features</h4>
+                    <ul>
+                        <li>✅ JWT Authentication & Authorization</li>
+                        <li>✅ Role-Based Access Control (Anonymous, User, Admin)</li>
+                        <li>✅ Book Catalog Management</li>
+                        <li>✅ Loan Tracking System</li>
+                        <li>✅ Advanced Filtering & Pagination</li>
+                        <li>✅ Comprehensive Testing Suite</li>
+                        <li>✅ Docker & Heroku Ready</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Books Section -->
+        <section id="books-section" class="section">
+            <div class="section-header">
+                <h2>Book Catalog</h2>
+                <div class="search-bar">
+                    <input type="text" id="bookSearch" placeholder="Search books by title, author, or ISBN...">
+                    <button id="searchBtn">Search</button>
+                </div>
+            </div>
+            <div id="booksContainer" class="books-grid">
+                <p class="loading">Loading books...</p>
+            </div>
+            <div class="pagination" id="booksPagination"></div>
+        </section>
+
+        <!-- Loans Section -->
+        <section id="loans-section" class="section">
+            <div class="section-header">
+                <h2>Active Loans</h2>
+                <button id="myLoansBtn" class="btn-secondary">My Loans</button>
+            </div>
+            <div id="loansContainer" class="loans-list">
+                <p class="loading">Loading loans...</p>
+            </div>
+            <div class="pagination" id="loansPagination"></div>
+        </section>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+                <p class="form-footer">Don't have an account? <a href="#" id="showRegister">Register</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Register</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="regUsername">Username</label>
+                    <input type="text" id="regUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email</label>
+                    <input type="email" id="regEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <input type="password" id="regPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword2">Confirm Password</label>
+                    <input type="password" id="regPassword2" required>
+                </div>
+                <button type="submit" class="btn-primary">Register</button>
+                <p class="form-footer">Already have an account? <a href="#" id="showLogin">Login</a></p>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Library Management System. Built with Django REST Framework.</p>
+            <p>
+                <a href="/swagger/">API Documentation</a> |
+                <a href="/admin/">Admin Panel</a> |
+                <a href="https://github.com/yourusername/library-management">GitHub</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
+
