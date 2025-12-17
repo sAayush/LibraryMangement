@@ -1,0 +1,67 @@
+{
+  "name": "Library Management System",
+  "description": "A Django REST API for library management with user authentication, book catalog, and loan tracking",
+  "keywords": ["django", "rest-api", "library", "jwt", "postgresql"],
+  "website": "https://github.com/yourusername/library-management",
+  "repository": "https://github.com/yourusername/library-management",
+  "logo": "https://cdn.worldvectorlogo.com/logos/django.svg",
+  "success_url": "/swagger/",
+  "env": {
+    "SECRET_KEY": {
+      "description": "Django secret key for cryptographic signing",
+      "generator": "secret"
+    },
+    "DEBUG": {
+      "description": "Debug mode (should be False in production)",
+      "value": "False"
+    },
+    "ALLOWED_HOSTS": {
+      "description": "Comma-separated list of allowed hosts",
+      "value": ".herokuapp.com"
+    },
+    "DB_NAME": {
+      "description": "Database name (automatically set by Heroku PostgreSQL)",
+      "required": false
+    },
+    "DB_USER": {
+      "description": "Database user (automatically set by Heroku PostgreSQL)",
+      "required": false
+    },
+    "DB_PASSWORD": {
+      "description": "Database password (automatically set by Heroku PostgreSQL)",
+      "required": false
+    },
+    "DB_HOST": {
+      "description": "Database host (automatically set by Heroku PostgreSQL)",
+      "required": false
+    },
+    "DB_PORT": {
+      "description": "Database port (automatically set by Heroku PostgreSQL)",
+      "value": "5432",
+      "required": false
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "eco"
+    }
+  },
+  "addons": [
+    {
+      "plan": "heroku-postgresql:essential-0",
+      "options": {
+        "version": "15"
+      }
+    }
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "scripts": {
+    "postdeploy": "python manage.py migrate && python manage.py collectstatic --noinput"
+  }
+}
+
